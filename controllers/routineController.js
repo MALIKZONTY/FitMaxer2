@@ -192,7 +192,8 @@ exports.generateRoutinePlan = async (req, res) => {
     }
 
     res.status(200).json({
-      message: '✅ routineDiet and routineWorkout created in structured format.'
+      message: '✅ routineDiet and routineWorkout created in structured format.',
+      isRedirect : true
     });
 
   } catch (error) {
