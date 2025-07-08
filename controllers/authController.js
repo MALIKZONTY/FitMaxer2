@@ -39,7 +39,7 @@ exports.signupUser = async (req, res) => {
     // Since this is a new user, no diet plan will exist yet.
     const noDietPlan = true;
 
-    res.status(201).json({ message: 'User created', uid: userId, accessToken: token, noDietPlan });
+    res.status(201).json({ message: 'User created', uid: userId, username: name, accessToken: token, noDietPlan });
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ error: 'Signup failed', details: err.message });
@@ -89,6 +89,7 @@ exports.loginUser = async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       uid,
+      username: foundUser.name,
       accessToken: token,
       noDietPlan
     });
