@@ -5,6 +5,10 @@ const admin = require('firebase-admin');
 
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+// Fix PEM newlines if needed
+if (serviceAccount.private_key) {
+  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+}
 
 
 const app = express();
