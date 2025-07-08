@@ -50,7 +50,7 @@ For vitamins, give me what vitamins are present and how much amount and give thi
 Only return valid numbers with units if known (e.g., "120 kcal", "12 g").
 `;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   //const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
     const aiResponse = await model.generateContent(prompt);
