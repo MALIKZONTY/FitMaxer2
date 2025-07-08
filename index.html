@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Visual Streak Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 40px;
+    }
+
+    .streak-container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .streak-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .progress-bar-background {
+      width: 100%;
+      height: 24px;
+      background-color: #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      transition: width 0.5s ease-in-out;
+    }
+
+    #progress-text {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="streak-container">
+    <div class="streak-labels">
+      <span>Day 0</span>
+      <span id="goal-label">Day 30</span>
+    </div>
+    <div class="progress-bar-background">
+      <div id="progress-bar-fill"></div>
+    </div>
+    <p id="progress-text">Current Streak: Day 0 of 30</p>
+  </div>
+
+  <script>
+    // Replace with real user ID from your login session
+    const userId = "7SR9TxD3iaaDBEZqxBkKGHDVXaT2";
+
+    function updateProgressBar(currentDay, goalDay) {
+      const progressPercent = Math.min((currentDay / goalDay) * 100, 100);
+      document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
+      document.getElementById('progress-text').textContent = `Current Streak: Day ${currentDay} of ${goalDay}`;
+      document.getElementById('goal-label').textContent = `Day ${goalDay}`;
+    }
+
+    async function updateStreakBar(userId) {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/streak/evaluate/${userId}/${today}`);
+        const data = await res.json();
+
+        if (res.ok) {
+          const current = data.data.currentDay;
+          const goal = data.data.goalDay;
+          updateProgressBar(current, goal);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error("Failed to fetch streak update:", error);
+      }
+    }
+
+    window.onload = () => {
+      updateStreakBar(userId);
+    };
+  </script>
+
+</body>
+</html>
