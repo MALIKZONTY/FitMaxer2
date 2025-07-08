@@ -12,6 +12,7 @@
 };
 
 */
+require('dotenv').config();
 
 const { OpenAI } = require("openai");
 const Joi = require('joi');
