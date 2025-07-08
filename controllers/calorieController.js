@@ -12,13 +12,12 @@
 };
 
 */
-require('dotenv').config();
 
-const { OpenAI } = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Joi = require('joi');
 
-// Initialize OpenAI
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.getCalorieInfo = async (req, res) => {
   try {
@@ -34,7 +33,7 @@ exports.getCalorieInfo = async (req, res) => {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    // Prompt for structured output
+    // Prompt to force structured format
     const prompt = `
 For the following food item: "${foodInput}", provide only the nutritional values in this exact JSON format:
 
@@ -43,23 +42,22 @@ For the following food item: "${foodInput}", provide only the nutritional values
   "carbs": "",
   "proteins": "",
   "fats": "",
-  "vitamins": {}
+  "vitamins": "",
 }
 
-Only return valid numbers with units (e.g., "120 kcal", "12 g", "2 mg"). For vitamins, return them as key-value pairs with their quantities.
+For vitamins, give me what vitamins are present and how much amount and give this vitamins in object format.
+
+Only return valid numbers with units if known (e.g., "120 kcal", "12 g").
 `;
 
-    // Use OpenAI to get the structured output
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // or "gpt-4o"
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.3,
-    });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  //const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
-    const responseText = completion.choices[0].message.content;
+    const aiResponse = await model.generateContent(prompt);
+    const responseText = aiResponse.response.text();
 
-    // Try extracting JSON from the response
-    const match = responseText.match(/\{[\s\S]*\}/);
+    // Try parsing the JSON part
+    const match = responseText.match(/\{[\s\S]*\}/); // Match JSON block
     if (!match) {
       return res.status(500).json({ error: "AI response could not be parsed" });
     }
@@ -70,6 +68,6 @@ Only return valid numbers with units (e.g., "120 kcal", "12 g", "2 mg"). For vit
 
   } catch (err) {
     console.error("Error in getCalorieInfo:", err);
-    res.status(500).json({ error: "Failed to process AI request", details: err.message });
+    res.status(500).json({ error: "Failed to process chatbot request", details: err.message });
   }
 };
